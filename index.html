@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Range Checker</title>
+</head>
+<body>
+    <button class="geo-btn">Get Current Location</button>
+
+    <script>
+
+        //isInRange takes current lat long from navigator object, give the target lat - long and radius in meters , returns true if isInRange
+        
+        
+        
+        function isInRange(myLat, myLon, targetLat, targetLon, range) {
+            const R = 6371e3; // Radius of the Earth in meters
+            const φ1 = myLat * Math.PI / 180; // φ, λ in radians
+            const φ2 = targetLat * Math.PI / 180;
+            const Δφ = (targetLat - myLat) * Math.PI / 180;
+            const Δλ = (targetLon - myLon) * Math.PI / 180;
+
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            const distance = R * c; // Distance in meters
+
+            return distance <= range;
+        }
+
+        document.querySelector('.geo-btn').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    console.log(`Your latitude is: ${position.coords.latitude}`);
+                    console.log(`Your longitude is: ${position.coords.longitude}`);
+                    const { latitude, longitude } = position.coords;
+
+                    const targetLat = 13.084852108082831; // Target latitude
+                    const targetLon = 77.64064313310752; // Target longitude
+                    const range = 250; // Radius in meters
+
+                    if (isInRange(latitude, longitude, targetLat, targetLon, range)) {
+                        console.log("You are in range.");
+                    } else {
+                        console.log("You are out of range.");
+                    }
+                    console.log(navigator);
+                }, (error) => {
+                    console.log(error.message);
+                });
+            }
+           
+        });
+    </script>
+</body>
+</html>
